@@ -1,9 +1,9 @@
 import React, { Component } from "react";
-import Login from "./Login/Login";
-import AddUser from "./Component/AddUser";
+
 import { BrowserRouter, Route } from "react-router-dom";
 import database from "./firebase";
 import SignIn from "./Login/SignIn";
+import { Button } from "@material-ui/core";
 
 class App extends Component {
   state = {
@@ -82,13 +82,19 @@ class App extends Component {
     //   this.setpeople(snapshot.docs.map((doc) => doc.data()))
     // );
   };
+  logout = () => {
+    this.setState({
+      ...this.state,
+      auth: false,
+    });
+  };
   render() {
     return (
       <div className="App">
-        {this.state.auth ? (
+        {this.state.auth === false ? (
           <SignIn setauth={this.setauth} authError={this.state.authError} />
         ) : (
-          ""
+          <Button onClick={this.logout}> logout</Button>
         )}
         <BrowserRouter>
           <Route path="/" exact></Route>
