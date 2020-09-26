@@ -1,26 +1,101 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { Component } from "react";
+import Login from "./Login/Login";
+import AddUser from "./Component/AddUser";
+import { BrowserRouter, Route } from "react-router-dom";
+import database from "./firebase";
+import SignIn from "./Login/SignIn";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends Component {
+  state = {
+    login: [
+      {
+        user: "utshav",
+      },
+      {
+        user: "timsina",
+      },
+    ],
+    auth: false,
+    authError: false,
+    role: null,
+  };
+  addUser = (e) => {
+    let login = [...this.state.login, e];
+    this.setState({
+      login: login,
+    });
+  };
+  deleteUser = (e) => {
+    let login = this.state.login.filter((user) => {
+      return user.user !== e ? true : false;
+    });
+    this.setState({
+      login: login,
+    });
+  };
+  setpeople = (e) => {
+    console.log(e);
+  };
+  checkAuth = (e) => {
+    console.log(e);
+  };
+  setauth = (username, password) => {
+    console.log(username, password);
+    var data = database
+      .collection("user")
+      .where("email", "==", username)
+      .where("password", "==", password)
+      .get()
+      .then((snapshot) => {
+        snapshot.size === 0
+          ? this.setState({
+              ...this.state,
+              authError: true,
+            })
+          : snapshot.forEach((doc) => {
+              this.setState({
+                ...this.state,
+                auth: true,
+                role: doc.data().role,
+                authError: false,
+              });
+            });
+      })
+      .catch((err) => alert(err));
+
+    // console.log(data);
+
+    // .get()
+    // .then(function (querySnapshot) {
+    //   querySnapshot.forEach(function (doc) {
+
+    //     checkAuth(doc);
+    //     console.log(doc.id, "  auth:", doc.data());
+    //   });
+    // })
+    // .catch(function (error) {
+    //   console.log("Error getting documents: ", error);
+    // });
+
+    // .collection("user")
+    // .onSnapshot((snapshot) =>
+    //   this.setpeople(snapshot.docs.map((doc) => doc.data()))
+    // );
+  };
+  render() {
+    return (
+      <div className="App">
+        {this.state.auth ? (
+          <SignIn setauth={this.setauth} authError={this.state.authError} />
+        ) : (
+          ""
+        )}
+        <BrowserRouter>
+          <Route path="/" exact></Route>
+        </BrowserRouter>
+      </div>
+    );
+  }
 }
 
 export default App;
